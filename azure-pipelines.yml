@@ -1,32 +1,43 @@
-# Node.js
-# Build a general Node.js project with npm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 stages:
 - stage: Build
-  displayName:  'Build Stage'
+  displayName: 'Build stage'
   jobs:
- - jobs: Build
-   displayName: 'Build job'
-   steps:
-   - task: NodeTool@0
-   inputs:
-     versionSpec: '14.x'
-   displayName: 'Install Node.js'
+  - job: Build
+    displayName: 'Build job'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
 
-- script: |
-    npm install
-    zip -r myExpressApp.zip
-  displayName: 'npm install and build'
+    - script: |
+        npm install
+        zip -r myExpressApp.zip .
+      displayName: 'Install and Build'
 
-- publish: '$(System.DefaultWorkingDirectory)/myExpressApp.zip'
-  artifact: 'myExpressApp'
-  displayName: 'publish Artifact'
+    - publish: '$(System.DefaultWorkingDirectory)/myExpressApp.zip'
+      artifact: 'myExpressApp'
+      displayName: 'Publish Artifact'
 
+
+# - stage: Deploy
+#   displayName: 'Deploy stage'
+#   dependsOn: Build
+#   jobs:
+#   - job: Deploy
+#     displayName: 'Deploy job'
+#     steps:
+#     - task: AzureWebApp@1
+#       inputs:
+#         azureSubscription: 'b262904d-4540-4dc0-8342-06f643f3a0ea'
+#         appName: 'testisg'
+#         package: '$(Pipeline.Workspace)/myExpressApp'
+#         runtimeStack: 'NODE|14-lts'
+#         startUpCommand: 'npm start'
+#       displayName: 'Deploy to Azure App Service'
